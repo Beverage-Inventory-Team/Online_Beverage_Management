@@ -1,0 +1,15 @@
+<resources>
+    <string name="app_name">Database</string>
+
+    <string name="Search">Search Beverages</string>
+
+    <string-array name="choice_array">
+        <item>name</item>
+        <item>style</item>
+        <item>volume</item>
+        <item>brewed</item>
+        <item>best</item>
+        <item>storage</item>
+    </string-array>
+
+</resources>

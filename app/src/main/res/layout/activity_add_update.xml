@@ -1,0 +1,134 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:background="@drawable/gradient"
+    tools:context=".AddUpdate">
+
+    <ImageView
+        android:id="@+id/capturedImage"
+        android:layout_width="match_parent"
+        android:layout_height="120dp"
+        android:layout_above="@+id/btnTakePicture"
+        android:background="#FFFFFF"
+        app:srcCompat="@android:drawable/ic_menu_camera" />
+
+    <ProgressBar
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:id="@+id/pbar"
+        style="@style/Widget.AppCompat.ProgressBar"
+        android:layout_gravity="center"
+        android:indeterminate="true"
+        android:visibility="gone"/>
+
+    <Button
+        android:id="@+id/btnTakePicture"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true"
+        android:layout_centerHorizontal="true"
+        android:text="Take a Photo"
+        android:textStyle="bold" />
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textColor="@android:color/holo_green_dark"
+        android:text="Storage:"/>
+
+    <EditText
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:id="@+id/edit_text"
+        android:hint="Enter Storage"
+        android:inputType="text"
+        android:background="@android:drawable/editbox_background"/>
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textColor="@android:color/holo_green_dark"
+        android:text="Name:"/>
+
+    <EditText
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:id="@+id/edit_name"
+        android:hint="Enter Name"
+        android:inputType="text"
+        android:background="@android:drawable/editbox_background"/>
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textColor="@android:color/holo_green_dark"
+        android:text="Style:"/>
+
+    <EditText
+        android:id="@+id/etStyle"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:hint="Style"
+        android:inputType="text"
+        android:background="@android:drawable/editbox_background" />
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textColor="@android:color/holo_green_dark"
+        android:text="Volume(ml):"/>
+
+    <EditText
+        android:id="@+id/etVolume"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:hint="Volume"
+        android:inputType="phone"
+        android:background="@android:drawable/editbox_background" />
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textColor="@android:color/holo_green_dark"
+        android:text="Brewed On:"/>
+
+    <EditText
+        android:id="@+id/etBrewed"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:hint="Brewed"
+        android:inputType="phone"
+        android:background="@android:drawable/editbox_background" />
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textColor="@android:color/holo_green_dark"
+        android:text="Best Before Date:"/>
+
+    <EditText
+        android:id="@+id/etExpDate"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:hint="Best Before"
+        android:inputType="phone"
+        android:background="@android:drawable/editbox_background" />
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textColor="@android:color/holo_green_dark"
+        android:text="Brewery:"/>
+
+    <EditText
+        android:id="@+id/etBrewery"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:hint="Brewery"
+        android:inputType="text"
+        android:background="@android:drawable/editbox_background" />
+
+</LinearLayout>
