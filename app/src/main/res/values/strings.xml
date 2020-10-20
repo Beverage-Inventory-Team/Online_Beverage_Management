@@ -12,4 +12,31 @@
         <item>storage</item>
     </string-array>
 
+    <string-array name="beer_style">
+    <item>LIGHT LAGER</item>
+    <item>PILSNER</item>
+    <item>EUROPEAN AMBER LAGER</item>
+    <item>DARK LAGER</item>
+    <item>BOCK</item>
+    <item>LIGHT HYBRID BEER</item>
+    <item>AMBER HYBRID BEER</item>
+    <item>ENGLISH PALE ALE</item>
+    <item>SCOTTISH AND IRISH ALE</item>
+    <item>AMERICAN ALE</item>
+    <item>ENGLISH BROWN ALE</item>
+    <item>POTER</item>
+    <item>STOUT</item>
+    <item>INDIA PALE ALE</item>
+    <item>GERMAN WHEAT AND RYE BEER</item>
+    <item> BELGIAN AND FRENCH ALE</item>
+    <item>SOUR ALE</item>
+    <item>BELGIAN STRONG ALE</item>
+    <item>STRONG ALE</item>
+    <item>FRUIT BEER</item>
+    <item>SPICE /HERB/VEGETABLE BEER</item>
+    <item>SMOKE-FLAVORED AND WOOD-AGED BEER</item>
+    <item>SPECIALITY BEER</item>
+    </string-array>
+
+
 </resources>

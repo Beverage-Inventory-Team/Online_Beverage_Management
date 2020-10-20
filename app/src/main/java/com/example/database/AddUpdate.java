@@ -5,6 +5,7 @@ import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.graphics.Color;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.Environment;
@@ -17,10 +18,14 @@ import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.AdapterView;
+import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.ProgressBar;
+import android.widget.Spinner;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
@@ -31,6 +36,8 @@ import androidx.core.content.FileProvider;
 
 import com.google.android.gms.tasks.Continuation;
 import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.OnFailureListener;
+import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
@@ -63,16 +70,21 @@ public class AddUpdate extends AppCompatActivity {
 
 
     private String currentPhotoPath;
+
+    private String duplicatePhotoPath;
+
+    private String tempPhotoPath;
+
     private FirebaseAuth Fauth;
 
     String resultemail;
-
-
+    private String item_choose;
 
     private EditText editText,editName,eStyle,eVolume,eBrewed,eExpdate,eBrewery;
 
     private Button btnCapture;
     private ImageView imgCapture;
+    private Spinner spinner_style;
     Bitmap bp;
     private FirebaseStorage mStorageRef = FirebaseStorage.getInstance();
     private ProgressBar progressBar;
@@ -100,7 +112,17 @@ public class AddUpdate extends AppCompatActivity {
 
         editText = findViewById(R.id.edit_text);
         editName = findViewById(R.id.edit_name);
-        eStyle = findViewById(R.id.etStyle);
+        //eStyle = findViewById(R.id.etStyle);
+
+        spinner_style = (Spinner) findViewById(R.id.spinner_style);
+        // Create an ArrayAdapter using the string array and a default spinner layout
+        ArrayAdapter<CharSequence> adapter2 = ArrayAdapter.createFromResource(this,
+                R.array.beer_style, android.R.layout.simple_spinner_item);
+        // Specify the layout to use when the list of choices appears
+        adapter2.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+        // Apply the adapter to the spinner
+        spinner_style.setAdapter(adapter2);
+
         eVolume = findViewById(R.id.etVolume);
         eBrewed = findViewById(R.id.etBrewed);
         eExpdate = findViewById(R.id.etExpDate);
@@ -183,7 +205,6 @@ public class AddUpdate extends AppCompatActivity {
             private String ddmmyyyy = "DDMMYYYY";
             private Calendar cal = Calendar.getInstance();
 
-
             @Override
             public void beforeTextChanged(CharSequence charSequence, int i, int i1, int i2) {
 
@@ -191,9 +212,6 @@ public class AddUpdate extends AppCompatActivity {
 
             @Override
             public void onTextChanged(CharSequence s, int i, int i1, int i2) {
-
-
-
                 if (!s.toString().equals(current)) {
                     String clean = s.toString().replaceAll("[^\\d.]|\\.", "");
                     String cleanC = current.replaceAll("[^\\d.]|\\.", "");
@@ -247,12 +265,19 @@ public class AddUpdate extends AppCompatActivity {
 
         eBrewed.addTextChangedListener(twe);
 
+        if (ContextCompat.checkSelfPermission(getApplicationContext(), Manifest.permission.CAMERA)
+                != PackageManager.PERMISSION_GRANTED) {
+            ActivityCompat.requestPermissions(AddUpdate.this, new String[]{Manifest.permission.CAMERA},
+                    0);
+        }
+
         btnCapture.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
 
                 String fileName = "photo";
-                File storageDirectory=getExternalFilesDir(Environment.DIRECTORY_PICTURES);
+                File storageDirectory=getApplicationContext().getExternalFilesDir(Environment.DIRECTORY_PICTURES);
+                //File storageDirectory=getExternalFilesDir(Environment.DIRECTORY_PICTURES);
 
                 try {
                     File imageFile = File.createTempFile(fileName,".jpg",storageDirectory);
@@ -273,6 +298,20 @@ public class AddUpdate extends AppCompatActivity {
 
 
 
+        spinner_style.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+            @Override
+            public void onItemSelected(AdapterView<?> adapterView, View view, int i, long l) {
+
+                ((TextView) adapterView.getChildAt(0)).setTextColor(Color.WHITE);
+                ((TextView) adapterView.getChildAt(0)).setTextSize(15);
+                item_choose = adapterView.getItemAtPosition(i).toString();
+            }
+
+            @Override
+            public void onNothingSelected(AdapterView<?> adapterView) {
+                spinner_style.requestFocus();
+            }
+        });
 
         Intent intent = getIntent();
 
@@ -281,7 +320,7 @@ public class AddUpdate extends AppCompatActivity {
             setTitle("Edit Item");
             editText.setText(intent.getStringExtra(EXTRA_TEXT));
             editName.setText(intent.getStringExtra(EXTRA_NAME));
-            eStyle.setText(intent.getStringExtra(EXTRA_STYLE));
+            //eStyle.setText(intent.getStringExtra(EXTRA_STYLE));
             eVolume.setText(""+intent.getIntExtra(EXTRA_VOLUME,0));
             eBrewed.setText(intent.getStringExtra(EXTRA_BREWED));
             eBrewery.setText(intent.getStringExtra(EXTRA_BREWERY));
@@ -290,6 +329,17 @@ public class AddUpdate extends AppCompatActivity {
             currentPhotoPath=intent.getStringExtra(EXTRA_BEST);
 
 
+
+                for(int i= 0; i < spinner_style.getAdapter().getCount(); i++)
+                {
+                    if(spinner_style.getAdapter().getItem(i).toString().contains(intent.getStringExtra(EXTRA_STYLE)))
+                    {
+                        spinner_style.setSelection(i);
+                    }
+                }
+
+
+            duplicatePhotoPath=currentPhotoPath;
 
         } else {
             setTitle("Add Item"); }
@@ -300,7 +350,7 @@ public class AddUpdate extends AppCompatActivity {
     {
         String text=editText.getText().toString();
         String name=editName.getText().toString();
-        String style=eStyle.getText().toString();
+        //String style=eStyle.getText().toString();
         String Tvolume=eVolume.getText().toString();
         int volume=Integer.parseInt(Tvolume);
         String brewed=eBrewed.getText().toString();
@@ -308,8 +358,10 @@ public class AddUpdate extends AppCompatActivity {
         String expdate=eExpdate.getText().toString();
         //byte [] image = DataConverter.convertImageToByteArray(bp);
 
+        String style=item_choose;
 
-        if (brewery.trim().isEmpty()||text.trim().isEmpty()||name.trim().isEmpty()||style.trim().isEmpty()||Tvolume.trim().isEmpty()||brewed.trim().isEmpty()||expdate.trim().isEmpty()){
+
+        if (brewery.trim().isEmpty()||text.trim().isEmpty()||name.trim().isEmpty()|| style.trim().isEmpty()||Tvolume.trim().isEmpty()||brewed.trim().isEmpty()||expdate.trim().isEmpty()){
             Toast.makeText(this,"Please fill out all the information",Toast.LENGTH_SHORT).show();
             return;
         }
@@ -341,11 +393,36 @@ public class AddUpdate extends AppCompatActivity {
         Toast.makeText(this,brewery,Toast.LENGTH_SHORT).show();
 
 
+        if ((duplicatePhotoPath!= null) && (duplicatePhotoPath!=currentPhotoPath))
+        {
+            Log.wtf("das","D = " + duplicatePhotoPath);
+            Log.wtf("dasing","E = " + currentPhotoPath);
+
+            Uri myUri = Uri.parse(duplicatePhotoPath);
+           // private FirebaseStorage mStorageRef = FirebaseStorage.getInstance();
+
+            StorageReference storageReference = FirebaseStorage.getInstance().getReferenceFromUrl(duplicatePhotoPath);
+            storageReference.delete().addOnSuccessListener(new OnSuccessListener<Void>() {
+                @Override
+                public void onSuccess(Void aVoid) {
+                    // File deleted successfully
+                    Toast.makeText(AddUpdate.this, "Deleted", Toast.LENGTH_SHORT).show();
+                }
+            }).addOnFailureListener(new OnFailureListener() {
+                @Override
+                public void onFailure(@NonNull Exception exception) {
+                    // Uh-oh, an error occurred!
+                    Toast.makeText(AddUpdate.this, " Not Deleted", Toast.LENGTH_SHORT).show();
+                }
+            });
+        }
+
+
 
         Intent data = new Intent();
         data.putExtra(EXTRA_TEXT,text);
         data.putExtra(EXTRA_NAME,name);
-        data.putExtra(EXTRA_STYLE,style);
+        data.putExtra(EXTRA_STYLE, style);
         data.putExtra(EXTRA_VOLUME,volume);
         data.putExtra(EXTRA_BREWED,brewed);
         data.putExtra(EXTRA_BREWERY,brewery);
@@ -353,9 +430,7 @@ public class AddUpdate extends AppCompatActivity {
         data.putExtra(EXTRA_BEST,currentPhotoPath);
         //data.putExtra(EXTRA_ARRAY,image);
 
-
         String id =getIntent().getStringExtra(EXTRA_ID);
-
 
         if (id!=null) {
             data.putExtra(EXTRA_ID,id);
@@ -379,6 +454,7 @@ public class AddUpdate extends AppCompatActivity {
                 saveNote();
                 return true;
             case android.R.id.home:
+                deletePhoto();
                 finish();
                 return false;
             default:
@@ -404,7 +480,6 @@ public class AddUpdate extends AppCompatActivity {
 
     public void uploadImage()
     {
-
         ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
         bp.compress(Bitmap.CompressFormat.PNG,100,outputStream);
         byte[] info= outputStream.toByteArray();
@@ -449,8 +524,8 @@ public class AddUpdate extends AppCompatActivity {
 
                 if (task.isSuccessful()) {
                     Uri downloadUri = task.getResult();
-                    Toast.makeText(AddUpdate.this, "dasdasdasdasd" + downloadUri, Toast.LENGTH_SHORT).show();
                     currentPhotoPath = downloadUri.toString();
+                    tempPhotoPath = currentPhotoPath;
                 }
                 progressBar.setVisibility(View.GONE);
                 progressBar.setEnabled(true);
@@ -458,6 +533,33 @@ public class AddUpdate extends AppCompatActivity {
         });
 
 
+
+    }
+
+    public void deletePhoto()
+    {
+        if (tempPhotoPath!=null)
+        {
+
+            Uri myUri = Uri.parse(tempPhotoPath);
+            // private FirebaseStorage mStorageRef = FirebaseStorage.getInstance();
+
+            StorageReference storageReference = FirebaseStorage.getInstance().getReferenceFromUrl(tempPhotoPath);
+            storageReference.delete().addOnSuccessListener(new OnSuccessListener<Void>() {
+                @Override
+                public void onSuccess(Void aVoid) {
+                    // File deleted successfully
+                    Toast.makeText(AddUpdate.this, "Deleted", Toast.LENGTH_SHORT).show();
+                }
+            }).addOnFailureListener(new OnFailureListener() {
+                @Override
+                public void onFailure(@NonNull Exception exception) {
+                    // Uh-oh, an error occurred!
+                    Toast.makeText(AddUpdate.this, " Not Deleted", Toast.LENGTH_SHORT).show();
+                }
+            });
+
+        }
 
     }
 

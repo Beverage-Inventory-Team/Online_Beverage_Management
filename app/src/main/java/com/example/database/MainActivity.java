@@ -6,6 +6,7 @@ import android.app.Dialog;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageManager;
+import android.os.Build;
 import android.os.Bundle;
 import android.text.TextUtils;
 import android.util.Log;
@@ -62,22 +63,12 @@ public class MainActivity extends AppCompatActivity {
     private String resultemail;
 
     private String sortchoice="volume";
-
-
-
-    int MY_PERMISSIONS_REQUEST_CAMERA=0;
-
-
-   // private FirebaseStorage mStorageRef = FirebaseStorage.getInstance();
-
     FirebaseDatabase Fdatabase;
     //DatabaseReference myRef;
 
     private FirebaseFirestore db = FirebaseFirestore.getInstance();
     private CollectionReference notebookRef;
     private MainAdapter adapter;
-
-
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -93,24 +84,16 @@ public class MainActivity extends AppCompatActivity {
 
         notebookRef = db.collection(resultemail);
 
-       // myRef = Fdatabase.getReference("users");
-
-
         //Adding the Plus button that looks like it's floating
         FloatingActionButton buttonAddNote = findViewById(R.id.button_add_note);
         FloatingActionButton buttonSearch = findViewById(R.id.button_search_p);
         FloatingActionButton buttonBarcode = findViewById(R.id.button_barcode);
 
+
         //Starting the activity after the button is clicked
         buttonAddNote.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                if (ContextCompat.checkSelfPermission(getApplicationContext(), Manifest.permission.CAMERA)
-                        != PackageManager.PERMISSION_GRANTED) {
-                    ActivityCompat.requestPermissions(MainActivity.this, new String[]{Manifest.permission.CAMERA},
-                            MY_PERMISSIONS_REQUEST_CAMERA);
-                }
-
                     Intent intent = new Intent(MainActivity.this, AddUpdate.class);
                     startActivityForResult(intent,ADD_NOTE_REQUEST);
               }
@@ -130,7 +113,6 @@ public class MainActivity extends AppCompatActivity {
                 startActivity(new Intent(MainActivity.this,ScanActivity.class));
             }
         });
-
 
         setUpRecyclerView();
     }
@@ -154,10 +136,6 @@ public class MainActivity extends AppCompatActivity {
     public boolean onOptionsItemSelected(@NonNull MenuItem item) {
 
         switch (item.getItemId()){
-/*            case R.id.delete_all:
-                Toast.makeText(this, "All items deleted", Toast.LENGTH_SHORT).show();
-                setUpRecyclerView();
-                return true;*/
             case R.id.logout_menu:
                 Logout();
                 return true;
@@ -323,7 +301,7 @@ public class MainActivity extends AppCompatActivity {
             .addOnFailureListener(new OnFailureListener() {
                 @Override
                 public void onFailure(@NonNull Exception e) {
-                    Toast.makeText(MainActivity.this, "Item Not Updated", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(MainActivity.this, "Item Not Added", Toast.LENGTH_SHORT).show();
                 }
             })
             ;
@@ -373,6 +351,7 @@ public class MainActivity extends AppCompatActivity {
             Toast.makeText(this, "Item Not Updated", Toast.LENGTH_SHORT).show();
         }
     }
+
 
     @Override
     protected void onStart() {
