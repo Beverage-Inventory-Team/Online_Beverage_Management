@@ -45,6 +45,7 @@ import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.Query;
 import com.google.firebase.storage.FirebaseStorage;
+import com.google.firebase.storage.StorageReference;
 
 
 import java.util.ArrayList;
@@ -201,6 +202,8 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onSwiped(@NonNull RecyclerView.ViewHolder viewHolder, int direction) {
 
+
+
                 AlertDialog diaBox = AskOption(viewHolder);
                 diaBox.show();
             }
@@ -247,6 +250,26 @@ public class MainActivity extends AppCompatActivity {
                 .setPositiveButton("Delete", new DialogInterface.OnClickListener() {
 
                     public void onClick(DialogInterface dialog, int whichButton) {
+
+
+                        //Get the URL of the image of the item that is about to be deleted
+                        String currentphoto = adapter.getItem(viewHolder.getAdapterPosition()).getBest();
+
+                        //Delete the image from the Firebase cloud Storage
+                        StorageReference storageReference = FirebaseStorage.getInstance().getReferenceFromUrl(currentphoto);
+                        storageReference.delete().addOnSuccessListener(new OnSuccessListener<Void>() {
+                            @Override
+                            public void onSuccess(Void aVoid) {
+                                // File deleted successfully
+                                //Toast.makeText(MainActivity.this, "Deleted", Toast.LENGTH_SHORT).show();
+                            }
+                        }).addOnFailureListener(new OnFailureListener() {
+                            @Override
+                            public void onFailure(@NonNull Exception exception) {
+                                // Uh-oh, an error occurred!
+                                //Toast.makeText(MainActivity.this, "Not Deleted", Toast.LENGTH_SHORT).show();
+                            }
+                        });
 
                         adapter.deleteItem(viewHolder.getAdapterPosition());
 
