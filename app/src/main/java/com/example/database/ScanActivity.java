@@ -43,10 +43,12 @@ public class ScanActivity extends AppCompatActivity implements ZXingScannerView.
     public void handleResult(Result result) {
 
         String code= result.getText();
-        Intent intent= new Intent(ScanActivity.this,ScanResult.class);
-        intent.putExtra(CODE_EXTRA,code);
-        startActivity(intent);
-        onBackPressed();
+        Intent rintent= new Intent();
+        rintent.putExtra(CODE_EXTRA,code);
+        //startActivity(intent);
+        setResult(RESULT_OK,rintent);
+        finish();
+        //onBackPressed();
     }
 
     @Override

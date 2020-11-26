@@ -48,6 +48,11 @@ import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
 
 
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -58,6 +63,7 @@ public class MainActivity extends AppCompatActivity {
 
     public static final int ADD_NOTE_REQUEST=1;
     public static final int EDIT_NOTE_REQUEST=2;
+    private static final int BARCODE_REQUEST = 3;
 
 
     private FirebaseAuth Fauth;
@@ -95,9 +101,9 @@ public class MainActivity extends AppCompatActivity {
         buttonAddNote.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                    Intent intent = new Intent(MainActivity.this, AddUpdate.class);
-                    startActivityForResult(intent,ADD_NOTE_REQUEST);
-              }
+                Intent intent = new Intent(MainActivity.this, AddUpdate.class);
+                startActivityForResult(intent,ADD_NOTE_REQUEST);
+            }
         });
 
         buttonSearch.setOnClickListener(new View.OnClickListener() {
@@ -111,11 +117,76 @@ public class MainActivity extends AppCompatActivity {
         buttonBarcode.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                startActivity(new Intent(MainActivity.this,ScanActivity.class));
+                // startActivity(new Intent(MainActivity.this,ScanActivity.class));
+                Intent intent = new Intent(MainActivity.this,ScanActivity.class);
+                startActivityForResult(intent,BARCODE_REQUEST);
+                //String code = intent.getStringExtra(ScanActivity.CODE_EXTRA);
+                //readData(code);
             }
         });
 
         setUpRecyclerView();
+    }
+
+    private void readData(String code) {
+        InputStream is = getResources().openRawResource(R.raw.beer_dataset);
+        BufferedReader reader = new BufferedReader(
+                new InputStreamReader(is, Charset.forName("UTF-8")));
+        String line = "";
+
+        String text="storage",name="name",style="style",brewed="brewed",best="best",expdate="expdate",brewery="brewery";
+        int volume=0;
+        int found=0;
+
+        try {
+            while ((line = reader.readLine()) != null) {
+                // Split the line into different tokens (using the comma as a separator).
+                String[] tokens = line.split(",");
+
+                if (code.equals(tokens[0]))
+                {
+                    name = tokens[1];
+                    style = tokens[2];
+
+                    try {
+                        volume = Integer.parseInt(tokens[3]);
+                    }
+                    catch (Exception e)
+                    {
+
+                    }
+                    brewery = tokens[4];
+
+                    Toast.makeText(this, "item found", Toast.LENGTH_SHORT).show();
+                    found = 1;
+                    break;
+                }
+            }
+        } catch (IOException e1) {
+            Log.e("MainActivity", "Error" + line, e1);
+            e1.printStackTrace();
+        }
+
+
+        if (found==1) {
+
+            Intent intent = new Intent(MainActivity.this,AddUpdate.class);
+            intent.putExtra(AddUpdate.EXTRA_ID,777);
+            //intent.putExtra(AddUpdate.EXTRA_TEXT,text);
+            intent.putExtra(AddUpdate.EXTRA_NAME,name);
+            intent.putExtra(AddUpdate.EXTRA_STYLE,style);
+            intent.putExtra(AddUpdate.EXTRA_VOLUME,volume);
+            //intent.putExtra(AddUpdate.EXTRA_BREWED,brewed);
+            intent.putExtra(AddUpdate.EXTRA_BREWERY,brewery);
+            //intent.putExtra(AddUpdate.EXTRA_BEST,best);
+            //intent.putExtra(AddUpdate.EXTRA_EXPDATE,expdate);
+            startActivityForResult(intent,ADD_NOTE_REQUEST);
+        }
+        else
+        {
+            Toast.makeText(this, "Barcode Not Found" , Toast.LENGTH_SHORT).show();
+            return;
+        }
     }
 
 
@@ -164,7 +235,7 @@ public class MainActivity extends AppCompatActivity {
                 sortchoice="expdate";
                 setUpRecyclerView();
                 return true;
-           case R.id.SortBrewery:
+            case R.id.SortBrewery:
                 sortchoice="brewery";
                 setUpRecyclerView();
                 return true;
@@ -215,6 +286,8 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onItemClick(DocumentSnapshot documentSnapshot, int position) {
 
+                Toast.makeText(MainActivity.this, ""+position, Toast.LENGTH_SHORT).show();
+
                 MainData mainData = documentSnapshot.toObject(MainData.class);
 
                 String id = documentSnapshot.getId();
@@ -256,20 +329,22 @@ public class MainActivity extends AppCompatActivity {
                         String currentphoto = adapter.getItem(viewHolder.getAdapterPosition()).getBest();
 
                         //Delete the image from the Firebase cloud Storage
-                        StorageReference storageReference = FirebaseStorage.getInstance().getReferenceFromUrl(currentphoto);
-                        storageReference.delete().addOnSuccessListener(new OnSuccessListener<Void>() {
-                            @Override
-                            public void onSuccess(Void aVoid) {
-                                // File deleted successfully
-                                //Toast.makeText(MainActivity.this, "Deleted", Toast.LENGTH_SHORT).show();
-                            }
-                        }).addOnFailureListener(new OnFailureListener() {
-                            @Override
-                            public void onFailure(@NonNull Exception exception) {
-                                // Uh-oh, an error occurred!
-                                //Toast.makeText(MainActivity.this, "Not Deleted", Toast.LENGTH_SHORT).show();
-                            }
-                        });
+                        if (currentphoto!=null && !currentphoto.trim().isEmpty()) {
+                            StorageReference storageReference = FirebaseStorage.getInstance().getReferenceFromUrl(currentphoto);
+                            storageReference.delete().addOnSuccessListener(new OnSuccessListener<Void>() {
+                                @Override
+                                public void onSuccess(Void aVoid) {
+                                    // File deleted successfully
+                                    //Toast.makeText(MainActivity.this, "Deleted", Toast.LENGTH_SHORT).show();
+                                }
+                            }).addOnFailureListener(new OnFailureListener() {
+                                @Override
+                                public void onFailure(@NonNull Exception exception) {
+                                    // Uh-oh, an error occurred!
+                                    //Toast.makeText(MainActivity.this, "Not Deleted", Toast.LENGTH_SHORT).show();
+                                }
+                            });
+                        }
 
                         adapter.deleteItem(viewHolder.getAdapterPosition());
 
@@ -315,18 +390,18 @@ public class MainActivity extends AppCompatActivity {
             CollectionReference notebookRef = FirebaseFirestore.getInstance()
                     .collection(resultemail);
             notebookRef.add(mainData)
-            .addOnSuccessListener(new OnSuccessListener<DocumentReference>() {
-                @Override
-                public void onSuccess(DocumentReference documentReference) {
-                    Toast.makeText(MainActivity.this, "Item Saved", Toast.LENGTH_SHORT).show();
-                }
-            })
-            .addOnFailureListener(new OnFailureListener() {
-                @Override
-                public void onFailure(@NonNull Exception e) {
-                    Toast.makeText(MainActivity.this, "Item Not Added", Toast.LENGTH_SHORT).show();
-                }
-            })
+                    .addOnSuccessListener(new OnSuccessListener<DocumentReference>() {
+                        @Override
+                        public void onSuccess(DocumentReference documentReference) {
+                            Toast.makeText(MainActivity.this, "Item Saved", Toast.LENGTH_SHORT).show();
+                        }
+                    })
+                    .addOnFailureListener(new OnFailureListener() {
+                        @Override
+                        public void onFailure(@NonNull Exception e) {
+                            Toast.makeText(MainActivity.this, "Item Not Added", Toast.LENGTH_SHORT).show();
+                        }
+                    })
             ;
 
 
@@ -369,6 +444,11 @@ public class MainActivity extends AppCompatActivity {
                     "expdate",sExpdate);
 
             Toast.makeText(this, "Item Updated", Toast.LENGTH_SHORT).show();
+        }
+        else if (requestCode == BARCODE_REQUEST && resultCode == RESULT_OK){
+
+            String code = data.getStringExtra(ScanActivity.CODE_EXTRA);
+            readData(code);
         }
         else {
             Toast.makeText(this, "Item Not Updated", Toast.LENGTH_SHORT).show();
