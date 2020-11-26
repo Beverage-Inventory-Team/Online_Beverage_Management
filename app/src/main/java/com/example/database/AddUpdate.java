@@ -296,8 +296,6 @@ public class AddUpdate extends AppCompatActivity {
             }
         });
 
-
-
         spinner_style.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
             @Override
             public void onItemSelected(AdapterView<?> adapterView, View view, int i, long l) {
@@ -328,7 +326,7 @@ public class AddUpdate extends AppCompatActivity {
             Picasso.get().load(intent.getStringExtra(EXTRA_BEST)).into(imgCapture);
             currentPhotoPath=intent.getStringExtra(EXTRA_BEST);
 
-
+            Toast.makeText(this, ""+ intent.getStringExtra(EXTRA_STYLE), Toast.LENGTH_SHORT).show();
 
                 for(int i= 0; i < spinner_style.getAdapter().getCount(); i++)
                 {
@@ -337,7 +335,6 @@ public class AddUpdate extends AppCompatActivity {
                         spinner_style.setSelection(i);
                     }
                 }
-
 
             duplicatePhotoPath=currentPhotoPath;
 
@@ -359,7 +356,6 @@ public class AddUpdate extends AppCompatActivity {
         //byte [] image = DataConverter.convertImageToByteArray(bp);
 
         String style=item_choose;
-
 
         if (brewery.trim().isEmpty()||text.trim().isEmpty()||name.trim().isEmpty()|| style.trim().isEmpty()||Tvolume.trim().isEmpty()||brewed.trim().isEmpty()||expdate.trim().isEmpty()){
             Toast.makeText(this,"Please fill out all the information",Toast.LENGTH_SHORT).show();
@@ -390,14 +386,9 @@ public class AddUpdate extends AppCompatActivity {
             return;
         }
 
-        Toast.makeText(this,brewery,Toast.LENGTH_SHORT).show();
-
 
         if ((duplicatePhotoPath!= null) && (duplicatePhotoPath!=currentPhotoPath))
         {
-            Log.wtf("das","D = " + duplicatePhotoPath);
-            Log.wtf("dasing","E = " + currentPhotoPath);
-
             Uri myUri = Uri.parse(duplicatePhotoPath);
            // private FirebaseStorage mStorageRef = FirebaseStorage.getInstance();
 
@@ -418,7 +409,6 @@ public class AddUpdate extends AppCompatActivity {
         }
 
 
-
         Intent data = new Intent();
         data.putExtra(EXTRA_TEXT,text);
         data.putExtra(EXTRA_NAME,name);
@@ -435,7 +425,6 @@ public class AddUpdate extends AppCompatActivity {
         if (id!=null) {
             data.putExtra(EXTRA_ID,id);
         }
-
         setResult(RESULT_OK,data);
         finish();
     }
@@ -501,7 +490,6 @@ public class AddUpdate extends AppCompatActivity {
             @Override
             public void onComplete(@NonNull Task<UploadTask.TaskSnapshot> task) {
                 Log.i("MA", "Upload Task Completed");
-                Toast.makeText(AddUpdate.this, "Upload Task Completed" , Toast.LENGTH_SHORT).show();
                 progressBar.setVisibility(View.GONE);
                 progressBar.setEnabled(true);
 
@@ -540,7 +528,6 @@ public class AddUpdate extends AppCompatActivity {
     {
         if (tempPhotoPath!=null)
         {
-
             Uri myUri = Uri.parse(tempPhotoPath);
             // private FirebaseStorage mStorageRef = FirebaseStorage.getInstance();
 

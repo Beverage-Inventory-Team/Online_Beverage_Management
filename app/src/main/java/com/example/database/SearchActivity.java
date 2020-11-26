@@ -49,10 +49,6 @@ public class SearchActivity extends AppCompatActivity {
 
     private FirebaseAuth Fauth;
 
-/*    final FirebaseUser users = Fauth.getCurrentUser();
-    String finaluser=users.getEmail();
-    final String resultemail = finaluser.replace(".","");*/
-
     private FirebaseFirestore db = FirebaseFirestore.getInstance();
     private CollectionReference notebookRef;
 
@@ -340,20 +336,22 @@ public class SearchActivity extends AppCompatActivity {
                         String currentphoto = adapter.getItem(viewHolder.getAdapterPosition()).getBest();
 
                         //Delete the image from the Firebase cloud Storage
-                        StorageReference storageReference = FirebaseStorage.getInstance().getReferenceFromUrl(currentphoto);
-                        storageReference.delete().addOnSuccessListener(new OnSuccessListener<Void>() {
-                            @Override
-                            public void onSuccess(Void aVoid) {
-                                // File deleted successfully
-                                //Toast.makeText(MainActivity.this, "Deleted", Toast.LENGTH_SHORT).show();
-                            }
-                        }).addOnFailureListener(new OnFailureListener() {
-                            @Override
-                            public void onFailure(@NonNull Exception exception) {
-                                // Uh-oh, an error occurred!
-                                //Toast.makeText(MainActivity.this, "Not Deleted", Toast.LENGTH_SHORT).show();
-                            }
-                        });
+                        if (currentphoto!=null && !currentphoto.trim().isEmpty()) {
+                            StorageReference storageReference = FirebaseStorage.getInstance().getReferenceFromUrl(currentphoto);
+                            storageReference.delete().addOnSuccessListener(new OnSuccessListener<Void>() {
+                                @Override
+                                public void onSuccess(Void aVoid) {
+                                    // File deleted successfully
+                                    //Toast.makeText(MainActivity.this, "Deleted", Toast.LENGTH_SHORT).show();
+                                }
+                            }).addOnFailureListener(new OnFailureListener() {
+                                @Override
+                                public void onFailure(@NonNull Exception exception) {
+                                    // Uh-oh, an error occurred!
+                                    //Toast.makeText(MainActivity.this, "Not Deleted", Toast.LENGTH_SHORT).show();
+                                }
+                            });
+                        }
 
                         adapter.deleteItem(viewHolder.getAdapterPosition());
 
