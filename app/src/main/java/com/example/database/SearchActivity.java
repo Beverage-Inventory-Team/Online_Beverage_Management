@@ -116,12 +116,12 @@ public class SearchActivity extends AppCompatActivity {
         String searchword = etSearch.getText().toString();
         int vol=0;
 
-        if (choice == "storage")
+        if (choice.equals("storage"))
         {
             choice="text";
         }
 
-        if (choice == "volume")
+        if (choice.equals("volume"))
         {
             try {
                 vol= Integer.parseInt(searchword);
@@ -136,7 +136,7 @@ public class SearchActivity extends AppCompatActivity {
 
         Query query;
 
-        if (choice == "volume")
+        if (choice.equals("volume"))
         {
             query= notebookRef.whereEqualTo(choice, vol);
         }

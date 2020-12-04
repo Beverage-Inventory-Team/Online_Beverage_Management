@@ -7,8 +7,8 @@
         <item>name</item>
         <item>style</item>
         <item>volume</item>
-        <item>brewed</item>
-        <item>best</item>
+        <item>brewery</item>
+        <item>expdate</item>
         <item>storage</item>
     </string-array>
 
